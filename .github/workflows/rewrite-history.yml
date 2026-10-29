@@ -1,0 +1,29 @@
+name: Rewrite bot commits (one-time)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.HISTORY_TOKEN }}   # PAT with "repo" + "workflow" scopes
+
+      - name: Rewrite authors with git filter-repo
+        run: |
+          pip install git-filter-repo
+          cat > ../mailmap <<'MAP'
+          Aboudlal <227255672+aboudlal@users.noreply.github.com> github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          Aboudlal <227255672+aboudlal@users.noreply.github.com> Abdellah Boudlal <227255672+aboudlal@users.noreply.github.com>
+          MAP
+          sed -i 's/^ *//' ../mailmap
+          git filter-repo --mailmap ../mailmap --force
+          git log --format='%an <%ae> | %cn <%ce>' | sort | uniq -c
+
+      - name: Force-push main
+        run: |
+          git remote add origin "https://x-access-token:${{ secrets.HISTORY_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push --force origin main
