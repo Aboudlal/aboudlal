@@ -48,13 +48,15 @@ INFO = [  # (label, id, value)  -- None = blank line, str = section header
 # --- Portrait crop ---
 CROPPED = "photo_cropped.png"
 FACE_RATIO = 0.70             # head height / image height
-CROP_ASPECT = 0.756           # crop width / height
+CROP_ASPECT = 0.694           # crop width / height (50 cols x 36 rows with 2:1 character cells)
+TOP_MARGIN = 0.02             # space kept above the hair (fraction of crop height)
 FACE_BOX = (205, 72, 110, 115)  # manual fallback (x, y, w, h) if no face is detected
 
 # --- Layout (px) ---
-INFO_X, INFO_LH, INFO_FONT = 295, 20, 16
+INFO_LH, INFO_FONT = 26, 16
 PAD = 30
-CARD_W = 880
+GAP = 22                            # space between portrait and right column
+CHAR_W = 0.602 * INFO_FONT          # monospace advance of the right column
 WIDTH = 58                          # right column width (characters)
 
 THEMES = {
@@ -157,7 +159,8 @@ def portrait(img):
     crop_w = crop_h * CROP_ASPECT
     cx = fx + fw / 2
     x0, y0 = int(cx - crop_w / 2), int(head_top - 0.06 * crop_h)
-    x1, y1 = int(x0 + crop_w), int(y0 + crop_h)
+    final_h = int(crop_h)
+    x1, y1 = int(x0 + crop_w), int(y0 + crop_h * 1.4)   # extra room below, trimmed after
 
     # Pad with edge pixels if the crop goes outside the photo
     pad = max(0, -x0, -y0, x1 - W, y1 - H)
@@ -189,6 +192,15 @@ def portrait(img):
 
     gray = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY).astype(np.float64) * fg  # background -> black
     alpha = (fg > 0.5).astype(np.uint8) * 255
+
+    # Tighten the top: start just above the first row of hair, keep the same aspect ratio
+    rows_fg = np.where((alpha > 0).sum(axis=1) > cw * 0.02)[0]
+    top = max(0, int(rows_fg[0] - TOP_MARGIN * final_h)) if len(rows_fg) else 0
+    gray, alpha = gray[top:top + final_h], alpha[top:top + final_h]
+    if gray.shape[0] < final_h:  # not enough photo below: pad with transparent rows
+        missing = final_h - gray.shape[0]
+        gray = np.vstack([gray, np.zeros((missing, cw))])
+        alpha = np.vstack([alpha, np.zeros((missing, cw), np.uint8)])
     return Image.merge("LA", (Image.fromarray(gray.clip(0, 255).astype(np.uint8)),
                               Image.fromarray(alpha)))
 
@@ -227,6 +239,11 @@ def info_lines(stats, age):
 def render(t, lines):
     first = PAD + 12
     height = first + (len(lines) - 1) * INFO_LH + PAD
+    # Portrait width follows from its height (= right column height) and the character aspect
+    rows = round(ascii_portrait.COLS / CROP_ASPECT * ascii_portrait.CHAR_ASPECT)
+    lh = ((len(lines) - 1) * INFO_LH + INFO_FONT) / rows
+    INFO_X = round(ascii_portrait.X + ascii_portrait.COLS * lh * ascii_portrait.CHAR_ASPECT + GAP)
+    CARD_W = round(INFO_X + WIDTH * CHAR_W + 20)
     info = "\n".join(f'<tspan x="{INFO_X}" y="{first + i * INFO_LH}">{l}</tspan>' for i, l in enumerate(lines))
     return f"""<?xml version='1.0' encoding='UTF-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,'DejaVu Sans Mono','Courier New',monospace" width="{CARD_W}px" height="{height}px" font-size="{INFO_FONT}px">
