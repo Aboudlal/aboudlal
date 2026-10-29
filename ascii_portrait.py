@@ -1,8 +1,10 @@
 """
-Turns photo_cropped.png into an ASCII portrait and writes it into
-dark_mode.svg and light_mode.svg (inside <g id="ascii-portrait">).
+Turns photo_cropped.png into an ASCII portrait and writes it into README.md,
+on the left of the info column, inside a ```text code block placed between
+<!-- STATS:START --> and <!-- STATS:END -->.
 
-Run it on its own to regenerate the portrait:   python ascii_portrait.py
+Run it on its own to regenerate only the portrait:   python ascii_portrait.py
+(the info column already in README.md is kept as is)
 
 photo_cropped.png is a grayscale image with an alpha channel:
 transparent pixels = background (rendered as spaces).
@@ -14,15 +16,15 @@ import numpy as np
 from PIL import Image
 
 SOURCE = "photo_cropped.png"
+README = "README.md"
+START, END = "<!-- STATS:START -->", "<!-- STATS:END -->"
+
 CHARSET = "@%#*+=-:. "      # densest -> lightest
 COLS = 50                   # portrait width in characters
-CHAR_ASPECT = 0.5           # a character cell is ~2x taller than wide
+CHAR_ASPECT = 0.38          # width / height of a character in GitHub code blocks (6.5px x 17.3px)
+GAP = 3                     # spaces between the portrait and the info column
+INVERT = False              # False: light areas = dense characters (made for GitHub dark mode)
 CLAHE_CLIP, CLAHE_GRID = 3.0, 6
-SVGS = {                    # file: (text colour, invert)
-    "dark_mode.svg": ("#c9d1d9", False),   # light areas = dense characters
-    "light_mode.svg": ("#24292f", True),   # dark areas = dense characters
-}
-X = 15                      # left margin (px)
 
 
 def load(path=SOURCE):
@@ -31,7 +33,7 @@ def load(path=SOURCE):
     return gray, alpha
 
 
-def ascii_rows(gray, alpha, invert):
+def ascii_rows(gray, alpha, invert=INVERT):
     h, w = gray.shape
     rows = max(1, round(COLS * h / w * CHAR_ASPECT))
 
@@ -54,40 +56,50 @@ def ascii_rows(gray, alpha, invert):
     return ["".join(CHARSET[i] for i in row) for row in idx]
 
 
-def info_bounds(svg):
-    """Top and bottom (px) of the right column, from its tspans' y values."""
-    block = re.search(r'<text id="info".*?</text>', svg, re.S).group(0)
-    ys = [float(y) for y in re.findall(r'<tspan x="[\d.]+" y="([\d.]+)"', block)]
-    size = float(re.search(r'font-size="([\d.]+)px"', svg).group(1))
-    return min(ys) - 0.75 * size, max(ys) + 0.25 * size
+def compose(portrait, info):
+    """Portrait on the left, info column vertically centred on the right, as a ```text block."""
+    top = max(0, (len(portrait) - len(info)) // 2)
+    height = max(len(portrait), top + len(info))
+    portrait = portrait + [""] * (height - len(portrait))
+    info = [""] * top + info + [""] * (height - top - len(info))
+    lines = [(p.ljust(COLS) + " " * GAP + i).rstrip() for p, i in zip(portrait, info)]
+    return "```text\n" + "\n".join(lines) + "\n```"
 
 
-def block_svg(rows, top, bottom, colour):
-    lh = (bottom - top) / len(rows)            # line height: same total height as the right column
-    char_w = lh * CHAR_ASPECT                  # cell width
-    font = char_w / 0.6                        # monospace advance ~0.6em
-    width = char_w * len(rows[0])
-    lines = "\n".join(
-        f'<tspan x="{X}" y="{top + lh * (i + 0.8):.2f}" textLength="{width:.2f}" '
-        f'lengthAdjust="spacingAndGlyphs">{r}</tspan>'
-        for i, r in enumerate(rows))
-    return (f'<g id="ascii-portrait">\n'
-            f'<text x="{X}" y="{top:.2f}" fill="{colour}" font-size="{font:.2f}px" '
-            f'font-family="ConsolasFallback,Consolas,\'DejaVu Sans Mono\',\'Courier New\',monospace" '
-            f'xml:space="preserve">\n{lines}\n</text>\n</g>')
+def read_info(path=README):
+    """Info column currently in README.md (everything right of the portrait)."""
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    block = re.search(re.escape(START) + r"\s*```text\n(.*?)\n```", text, re.S)
+    if not block:
+        return []
+    info = [line[COLS + GAP:] for line in block.group(1).split("\n")]
+    while info and not info[0].strip():
+        info.pop(0)
+    while info and not info[-1].strip():
+        info.pop()
+    return info
+
+
+def write_readme(block, path=README):
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+    except FileNotFoundError:
+        text = ""
+    new = f"{START}\n{block}\n{END}"
+    if START in text and END in text:
+        text = re.sub(re.escape(START) + r".*?" + re.escape(END), lambda _: new, text, count=1, flags=re.S)
+    else:
+        text = new + "\n" + text
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
 
 
 def main():
     gray, alpha = load()
-    for filename, (colour, invert) in SVGS.items():
-        with open(filename, encoding="utf-8") as f:
-            svg = f.read()
-        top, bottom = info_bounds(svg)
-        block = block_svg(ascii_rows(gray, alpha, invert), top, bottom, colour)
-        svg = re.sub(r'<g id="ascii-portrait">.*?</g>', lambda _: block, svg, count=1, flags=re.S)
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(svg)
-    print("ASCII portrait written to", ", ".join(SVGS))
+    write_readme(compose(ascii_rows(gray, alpha), read_info()))
+    print("ASCII portrait written to", README)
 
 
 if __name__ == "__main__":
