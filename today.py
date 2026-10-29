@@ -1,10 +1,10 @@
 """
 Builds dark_mode.svg and light_mode.svg (neofetch-style profile card).
-  - ASCII portrait from photo.jpg (or the GitHub profile picture):
-    tight head + shoulders crop, background removed, contrast/brightness boost
+  - photo_cropped.png: tight head + shoulders crop of photo.jpg (or the GitHub
+    avatar) with the background removed; ascii_portrait.py turns it into text
   - Uptime computed from the birth date
   - GitHub stats (repos, stars, commits, followers) from the GraphQL API
-Every dynamic value has an id in the SVG (age_data, repo_data, ascii_0, ...).
+Every dynamic value has an id in the SVG (age_data, repo_data, ...).
 """
 import datetime
 import io
@@ -15,7 +15,9 @@ import cv2
 import numpy as np
 import requests
 from dateutil import relativedelta
-from PIL import Image, ImageEnhance
+from PIL import Image
+
+import ascii_portrait
 
 # =========================== SETTINGS ===========================
 USER_NAME = "aboudlal"
@@ -43,20 +45,16 @@ INFO = [  # (label, id, value)  -- None = blank line, str = section header
     "STATS",
 ]
 
-# --- Portrait ---
-ASCII_STYLE = "braille"       # "classic" or "braille"
-ASCII_COLS, ASCII_ROWS = 60, 40
-CHARSET = "@%#*+=-:. "        # densest -> lightest (bright pixels = dense chars)
+# --- Portrait crop ---
+CROPPED = "photo_cropped.png"
 FACE_RATIO = 0.70             # head height / image height
-CONTRAST, BRIGHTNESS = 1.40, 1.15
-FACE_BOX = (205, 72, 110, 115)            # manual fallback (x, y, w, h) if no face is detected
+CROP_ASPECT = 0.756           # crop width / height
+FACE_BOX = (205, 72, 110, 115)  # manual fallback (x, y, w, h) if no face is detected
 
 # --- Layout (px) ---
-ASCII_FONT, ASCII_LH = 10.5, 12.5   # small font for the portrait block
-ASCII_X, ASCII_Y0 = 15, 25
-ASCII_WIDTH_PX = 378                # every portrait line is stretched to this width
-INFO_X, INFO_Y0, INFO_LH, INFO_FONT = 420, 30, 20, 16
-CARD_W, CARD_H = 1000, 530
+INFO_X, INFO_LH, INFO_FONT = 295, 20, 16
+PAD = 30
+CARD_W = 880
 WIDTH = 58                          # right column width (characters)
 
 THEMES = {
@@ -145,7 +143,7 @@ def detect_face(rgb):
 
 
 def portrait(img):
-    """Crop head + shoulders, remove background (black), boost contrast/brightness. Returns grayscale PIL image."""
+    """Crop head + shoulders and remove the background. Returns a grayscale+alpha (LA) PIL image."""
     rgb = np.array(img.convert("RGB"))
     H, W = rgb.shape[:2]
     face = detect_face(rgb)
@@ -156,8 +154,7 @@ def portrait(img):
     # Whole head ~ face box + hair above + chin below
     head_top, head_h = fy - 0.55 * fh, 1.75 * fh
     crop_h = head_h / FACE_RATIO
-    aspect = ASCII_WIDTH_PX / (ASCII_ROWS * ASCII_LH)       # portrait block width / height
-    crop_w = crop_h * aspect
+    crop_w = crop_h * CROP_ASPECT
     cx = fx + fw / 2
     x0, y0 = int(cx - crop_w / 2), int(head_top - 0.06 * crop_h)
     x1, y1 = int(x0 + crop_w), int(y0 + crop_h)
@@ -191,34 +188,9 @@ def portrait(img):
         fg = np.ones((ch, cw))
 
     gray = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY).astype(np.float64) * fg  # background -> black
-    out = Image.fromarray(gray.clip(0, 255).astype(np.uint8))
-    out = ImageEnhance.Contrast(out).enhance(CONTRAST)
-    out = ImageEnhance.Brightness(out).enhance(BRIGHTNESS)
-    # keep the background pure black after the enhancements
-    out = Image.fromarray((np.array(out) * (fg > 0.5)).astype(np.uint8))
-    return out
-
-
-def ascii_classic(gray):
-    small = np.array(gray.resize((ASCII_COLS, ASCII_ROWS), Image.LANCZOS), dtype=np.float64)
-    n = len(CHARSET) - 1
-    idx = np.rint((1 - small / 255) * n).astype(int)          # bright -> index 0 (densest)
-    return ["".join(CHARSET[i] for i in row) for row in idx]
-
-
-def ascii_braille(gray):
-    w, h = ASCII_COLS * 2, ASCII_ROWS * 4
-    dots = np.array(gray.resize((w, h), Image.LANCZOS).convert("1"))  # Floyd-Steinberg dithering
-    bits = [(0, 0, 0x01), (0, 1, 0x02), (0, 2, 0x04), (1, 0, 0x08),
-            (1, 1, 0x10), (1, 2, 0x20), (0, 3, 0x40), (1, 3, 0x80)]
-    rows = []
-    for r in range(ASCII_ROWS):
-        line = ""
-        for c in range(ASCII_COLS):
-            code = sum(b for dx, dy, b in bits if dots[r * 4 + dy, c * 2 + dx])
-            line += chr(0x2800 + code)
-        rows.append(line)
-    return rows
+    alpha = (fg > 0.5).astype(np.uint8) * 255
+    return Image.merge("LA", (Image.fromarray(gray.clip(0, 255).astype(np.uint8)),
+                              Image.fromarray(alpha)))
 
 
 # ------------------------------------------------------------- SVG
@@ -252,29 +224,22 @@ def info_lines(stats, age):
     return lines
 
 
-def render(t, ascii_rows, lines):
-    rows_per_card = (CARD_H - INFO_Y0) // INFO_LH
-    top = INFO_Y0 + (rows_per_card - len(lines)) // 2 * INFO_LH
-    art = "\n".join(
-        f'<tspan x="{ASCII_X}" y="{ASCII_Y0 + i * ASCII_LH}" id="ascii_{i}" '
-        f'textLength="{ASCII_WIDTH_PX}" lengthAdjust="spacingAndGlyphs">{escape(r)}</tspan>'
-        for i, r in enumerate(ascii_rows))
-    info = "\n".join(f'<tspan x="{INFO_X}" y="{top + i * INFO_LH}">{l}</tspan>' for i, l in enumerate(lines))
+def render(t, lines):
+    first = PAD + 12
+    height = first + (len(lines) - 1) * INFO_LH + PAD
+    info = "\n".join(f'<tspan x="{INFO_X}" y="{first + i * INFO_LH}">{l}</tspan>' for i, l in enumerate(lines))
     return f"""<?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,'DejaVu Sans Mono','Courier New',monospace" width="{CARD_W}px" height="{CARD_H}px" font-size="{INFO_FONT}px">
+<svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,'DejaVu Sans Mono','Courier New',monospace" width="{CARD_W}px" height="{height}px" font-size="{INFO_FONT}px">
 <style>
 @font-face {{ src: local('Consolas'), local('Consolas Bold'); font-family: 'ConsolasFallback'; font-display: swap; -webkit-size-adjust: 109%; size-adjust: 109%; }}
 .key {{fill: {t['key']};}}
 .value {{fill: {t['value']};}}
 .cc {{fill: {t['cc']};}}
-.ascii {{font-size: {ASCII_FONT}px; font-family: 'DejaVu Sans Mono',Consolas,'Courier New',monospace;}}
 text, tspan {{white-space: pre;}}
 </style>
-<rect width="{CARD_W}px" height="{CARD_H}px" fill="{t['bg']}" stroke="{t['border']}" rx="15"/>
-<text class="ascii" x="{ASCII_X}" y="{ASCII_Y0}" fill="{t['text']}" xml:space="preserve">
-{art}
-</text>
-<text x="{INFO_X}" y="{INFO_Y0}" fill="{t['text']}" xml:space="preserve">
+<rect width="{CARD_W}px" height="{height}px" fill="{t['bg']}" stroke="{t['border']}" rx="15"/>
+<g id="ascii-portrait"></g>
+<text id="info" x="{INFO_X}" y="{first}" fill="{t['text']}" xml:space="preserve">
 {info}
 </text>
 </svg>
@@ -293,10 +258,10 @@ if __name__ == "__main__":
     print(f"Uptime: {age} | Repos: {stats['repos']} | Stars: {stats['stars']} | "
           f"Commits: {stats['commits']} | Followers: {stats['followers']}")
 
-    gray = portrait(load_photo(stats))
-    rows = ascii_braille(gray) if ASCII_STYLE == "braille" else ascii_classic(gray)
+    portrait(load_photo(stats)).save(CROPPED)
     lines = info_lines(stats, age)
     for filename, theme in THEMES.items():
         with open(filename, "w", encoding="utf-8") as f:
-            f.write(render(theme, rows, lines))
+            f.write(render(theme, lines))
+    ascii_portrait.main()  # writes the ASCII block from photo_cropped.png
     print("SVG files updated.")
