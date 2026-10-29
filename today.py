@@ -1,58 +1,63 @@
 """
-Updates the neofetch-style card in README.md (selectable text, ```text block
-between <!-- STATS:START --> and <!-- STATS:END -->):
-  - photo_cropped.png: tight head + shoulders crop of photo.jpg (or the GitHub
-    avatar) with the background removed; ascii_portrait.py turns it into text
-  - Uptime computed from the birth date
-  - GitHub stats (repos, stars, commits, followers) from the GraphQL API
+Builds dark_mode.svg and light_mode.svg: a neofetch-style card with an ASCII
+portrait (from photo_cropped.png, see ascii_portrait.py) and live GitHub stats.
+
+Stats come from the GitHub GraphQL API (ACCESS_TOKEN secret, or the workflow's
+built-in token). Every dynamic value has an id in the SVG (age_data, repo_data,
+contrib_data, star_data, commit_data, follower_data, loc_data, loc_add, loc_del).
 """
 import datetime
-import io
 import os
+from xml.sax.saxutils import escape
 
-import cv2
-import numpy as np
 import requests
 from dateutil import relativedelta
-from PIL import Image
 
 import ascii_portrait
 
 # =========================== SETTINGS ===========================
 USER_NAME = "aboudlal"
-BIRTHDAY = None  # e.g. datetime.date(1990, 1, 31) -> shows the Uptime line
-PHOTO = "photo.jpg"  # used if present, otherwise the GitHub avatar
+BIRTHDAY = None                 # e.g. datetime.date(1990, 1, 31); None hides the Uptime line
+EMAIL_PERSONAL = None           # e.g. "name@example.com"; None hides the line
+EMAIL_WORK = None               # e.g. "contact@elitevisa.com"; None hides the line
 
-INFO = [  # (label, id, value)  -- None = blank line, str = section header
+INFO = [  # (key, id, value) | "title" | None (blank line) | special rows
     "abdellah@boudlal",
-    ("Role", "role", "Data Analyst"),
+    ("OS", "os", "Windows 11, iOS, Linux"),
+    ("Uptime", "age_data", "UPTIME"),
     ("Host", "host", "Elite Visa (Founder, since 2018)"),
-    ("Uptime", "age_data", None),
+    ("Kernel", "kernel", "Data Analyst"),
+    ("IDE", "ide", "VSCode, Jupyter, Power BI Desktop"),
     None,
-    ("Languages", "languages", "SQL, Python, DAX"),
-    ("Tools", "tools", "Power BI, Excel, Tableau"),
-    ("Libraries", "libraries", "Pandas, NumPy, Matplotlib"),
-    ("Real", "real", "French, Arabic, English"),
-    ("Focus", "focus", "Dashboards, KPIs, data cleaning, reporting"),
+    ("Languages.Programming", "lang_prog", "SQL, Python, DAX"),
+    ("Languages.Computer", "lang_comp", "HTML, CSS, JSON, Markdown"),
+    ("Languages.Real", "lang_real", "French, Arabic, English"),
     None,
-    "- Contact",
+    ("Tools.Data", "tools_data", "Power BI, Excel, Tableau"),
+    ("Tools.Libraries", "tools_libs", "Pandas, NumPy, Matplotlib"),
+    None,
+    "Contact",
     ("Website", "website", "abdellahboudlal.com"),
+    ("Email.Personal", "email_personal", EMAIL_PERSONAL),
+    ("Email.Work", "email_work", EMAIL_WORK),
     ("LinkedIn", "linkedin", "aboudlal"),
-    ("GitHub", "github", "aboudlal"),
     None,
-    "- GitHub Stats",
+    "GitHub Stats",
     "STATS",
 ]
 
-# --- Portrait crop ---
-CROPPED = "photo_cropped.png"
-FACE_RATIO = 0.70             # head height / image height
-CROP_ASPECT = 0.694           # crop width / height
-TOP_MARGIN = 0.02             # space kept above the hair (fraction of crop height)
-FACE_BOX = (205, 72, 110, 115)  # manual fallback (x, y, w, h) if no face is detected
+WIDTH, HALF = 60, 30            # info column width / left half of the stats rows (characters)
+FONT_SIZE, LINE_H = 16, 20
+CHAR_W = 0.602 * FONT_SIZE      # monospace advance used to size the card
+PAD, GAP = 20, 25
+FONT = "Consolas,'DejaVu Sans Mono','Courier New',monospace"
 
-WIDTH = 58                    # info column width (characters)
-
+THEMES = {
+    "dark_mode.svg": dict(bg="#161b22", border="#30363d", text="#c9d1d9", key="#ffa657",
+                          value="#a5d6ff", cc="#616e7f", add="#3fb950", rem="#f85149"),
+    "light_mode.svg": dict(bg="#f6f8fa", border="#d0d7de", text="#24292f", key="#953800",
+                           value="#0a3069", cc="#8c959f", add="#1a7f37", rem="#cf222e"),
+}
 # ================================================================
 
 TOKEN = os.environ.get("ACCESS_TOKEN") or os.environ.get("GITHUB_TOKEN")
@@ -60,10 +65,9 @@ HEADERS = {"authorization": f"bearer {TOKEN}"}
 
 
 # ------------------------------------------------------------- GitHub
-def graphql(query, variables):
-    r = requests.post("https://api.github.com/graphql",
-                      json={"query": query, "variables": variables},
-                      headers=HEADERS, timeout=30)
+def graphql(query, **variables):
+    r = requests.post("https://api.github.com/graphql", json={"query": query, "variables": variables},
+                      headers=HEADERS, timeout=60)
     r.raise_for_status()
     data = r.json()
     if "errors" in data:
@@ -72,46 +76,62 @@ def graphql(query, variables):
 
 
 def github_stats(login):
-    query = """
-    query($login: String!, $cursor: String) {
-      user(login: $login) {
-        avatarUrl(size: 460)
+    user = graphql("""query($login: String!) { user(login: $login) {
+        id
         followers { totalCount }
         contributionsCollection { contributionYears }
-        repositories(first: 100, after: $cursor, ownerAffiliations: OWNER) {
-          totalCount
-          pageInfo { hasNextPage endCursor }
-          nodes { stargazerCount }
-        }
-      }
-    }"""
-    cursor, stars = None, 0
-    while True:
-        user = graphql(query, {"login": login, "cursor": cursor})["user"]
-        repos = user["repositories"]
-        stars += sum(n["stargazerCount"] for n in repos["nodes"])
-        if not repos["pageInfo"]["hasNextPage"]:
-            break
-        cursor = repos["pageInfo"]["endCursor"]
+        repositoriesContributedTo(includeUserRepositories: true,
+          contributionTypes: [COMMIT, PULL_REQUEST, REPOSITORY]) { totalCount }
+    } }""", login=login)["user"]
 
-    commits_query = """
-    query($login: String!, $from: DateTime!, $to: DateTime!) {
-      user(login: $login) {
-        contributionsCollection(from: $from, to: $to) {
-          totalCommitContributions
-          restrictedContributionsCount
-        }
-      }
-    }"""
+    repos, cursor = [], None
+    while True:
+        page = graphql("""query($login: String!, $cursor: String) { user(login: $login) {
+            repositories(first: 100, after: $cursor, ownerAffiliations: OWNER) {
+              totalCount
+              pageInfo { hasNextPage endCursor }
+              nodes { name stargazerCount isFork }
+            } } }""", login=login, cursor=cursor)["user"]["repositories"]
+        repos += page["nodes"]
+        if not page["pageInfo"]["hasNextPage"]:
+            break
+        cursor = page["pageInfo"]["endCursor"]
+
     commits = 0
     for y in user["contributionsCollection"]["contributionYears"]:
-        c = graphql(commits_query, {"login": login,
-                                    "from": f"{y}-01-01T00:00:00Z",
-                                    "to": f"{y}-12-31T23:59:59Z"})["user"]["contributionsCollection"]
+        c = graphql("""query($login: String!, $from: DateTime!, $to: DateTime!) { user(login: $login) {
+            contributionsCollection(from: $from, to: $to) {
+              totalCommitContributions restrictedContributionsCount } } }""",
+                    login=login, **{"from": f"{y}-01-01T00:00:00Z", "to": f"{y}-12-31T23:59:59Z"}
+                    )["user"]["contributionsCollection"]
         commits += c["totalCommitContributions"] + c["restrictedContributionsCount"]
 
-    return dict(repos=repos["totalCount"], stars=stars, commits=commits,
-                followers=user["followers"]["totalCount"], avatar=user["avatarUrl"])
+    added = deleted = 0
+    for repo in repos:
+        if repo["isFork"]:
+            continue
+        cursor = None
+        while True:
+            ref = graphql("""query($owner: String!, $name: String!, $id: ID!, $cursor: String) {
+                repository(owner: $owner, name: $name) { defaultBranchRef { target { ... on Commit {
+                  history(first: 100, after: $cursor, author: {id: $id}) {
+                    pageInfo { hasNextPage endCursor }
+                    nodes { additions deletions } } } } } } }""",
+                          owner=login, name=repo["name"], id=user["id"], cursor=cursor
+                          )["repository"]["defaultBranchRef"]
+            if not ref:
+                break
+            hist = ref["target"]["history"]
+            added += sum(n["additions"] for n in hist["nodes"])
+            deleted += sum(n["deletions"] for n in hist["nodes"])
+            if not hist["pageInfo"]["hasNextPage"]:
+                break
+            cursor = hist["pageInfo"]["endCursor"]
+
+    return dict(repos=len(repos), contrib=user["repositoriesContributedTo"]["totalCount"],
+                stars=sum(r["stargazerCount"] for r in repos), commits=commits,
+                followers=user["followers"]["totalCount"],
+                added=added, deleted=deleted, loc=added - deleted)
 
 
 def uptime(birthday):
@@ -120,123 +140,92 @@ def uptime(birthday):
     return ", ".join([unit(d.years, "year"), unit(d.months, "month"), unit(d.days, "day")])
 
 
-# ------------------------------------------------------------- Portrait
-def detect_face(rgb):
-    """Largest frontal face (x, y, w, h), or FACE_BOX, or None."""
-    try:
-        cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-        gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
-        faces = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(40, 40))
-        if len(faces):
-            return tuple(int(v) for v in max(faces, key=lambda f: f[2] * f[3]))
-    except Exception as e:  # cascade missing, etc.
-        print("Face detection unavailable:", e)
-    return FACE_BOX
-
-
-def portrait(img):
-    """Crop head + shoulders and remove the background. Returns a grayscale+alpha (LA) PIL image."""
-    rgb = np.array(img.convert("RGB"))
-    H, W = rgb.shape[:2]
-    face = detect_face(rgb)
-    if face is None:  # no face: centred square from the top
-        face = (int(W * 0.35), int(H * 0.15), int(W * 0.3), int(H * 0.3))
-    fx, fy, fw, fh = face
-
-    # Whole head ~ face box + hair above + chin below
-    head_top, head_h = fy - 0.55 * fh, 1.75 * fh
-    crop_h = head_h / FACE_RATIO
-    crop_w = crop_h * CROP_ASPECT
-    cx = fx + fw / 2
-    x0, y0 = int(cx - crop_w / 2), int(head_top - 0.06 * crop_h)
-    final_h = int(crop_h)
-    x1, y1 = int(x0 + crop_w), int(y0 + crop_h * 1.4)   # extra room below, trimmed after
-
-    # Pad with edge pixels if the crop goes outside the photo
-    pad = max(0, -x0, -y0, x1 - W, y1 - H)
-    if pad:
-        rgb = cv2.copyMakeBorder(rgb, pad, pad, pad, pad, cv2.BORDER_REPLICATE)
-        x0, y0, x1, y1 = x0 + pad, y0 + pad, x1 + pad, y1 + pad
-        fx, fy = fx + pad, fy + pad
-    crop = np.ascontiguousarray(rgb[y0:y1, x0:x1])
-    ch, cw = crop.shape[:2]
-
-    # Background removal with GrabCut, seeded by the face position
-    mask = np.full((ch, cw), cv2.GC_PR_BGD, np.uint8)
-    hx0, hx1 = int(fx - x0 - 0.15 * fw), int(fx - x0 + 1.15 * fw)
-    hy0 = int(fy - y0 - 0.55 * fh)
-    mask[max(hy0, 0):, max(hx0, 0):min(hx1, cw)] = cv2.GC_PR_FGD           # head + neck column
-    mask[int(fy - y0 + 1.5 * fh):, int(cw * 0.08):int(cw * 0.92)] = cv2.GC_PR_FGD  # shoulders
-    mask[int(fy - y0 + 0.15 * fh):int(fy - y0 + 0.9 * fh),
-         int(fx - x0 + 0.2 * fw):int(fx - x0 + 0.8 * fw)] = cv2.GC_FGD      # sure: centre of face
-    mask[:, :2] = mask[:, -2:] = cv2.GC_BGD                                  # sure: side borders
-    mask[:2, :] = cv2.GC_BGD
-    try:
-        bgd, fgd = np.zeros((1, 65), np.float64), np.zeros((1, 65), np.float64)
-        cv2.grabCut(cv2.cvtColor(crop, cv2.COLOR_RGB2BGR), mask, None, bgd, fgd, 5, cv2.GC_INIT_WITH_MASK)
-        fg = np.where((mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD), 1.0, 0.0)
-        fg = cv2.GaussianBlur(fg, (5, 5), 0)
-    except cv2.error as e:
-        print("Background removal failed:", e)
-        fg = np.ones((ch, cw))
-
-    gray = cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY).astype(np.float64) * fg  # background -> black
-    alpha = (fg > 0.5).astype(np.uint8) * 255
-
-    # Tighten the top: start just above the first row of hair, keep the same aspect ratio
-    rows_fg = np.where((alpha > 0).sum(axis=1) > cw * 0.02)[0]
-    top = max(0, int(rows_fg[0] - TOP_MARGIN * final_h)) if len(rows_fg) else 0
-    gray, alpha = gray[top:top + final_h], alpha[top:top + final_h]
-    if gray.shape[0] < final_h:  # not enough photo below: pad with transparent rows
-        missing = final_h - gray.shape[0]
-        gray = np.vstack([gray, np.zeros((missing, cw))])
-        alpha = np.vstack([alpha, np.zeros((missing, cw), np.uint8)])
-    return Image.merge("LA", (Image.fromarray(gray.clip(0, 255).astype(np.uint8)),
-                              Image.fromarray(alpha)))
-
-
 # ------------------------------------------------------------- Info column
-def kv(label, value, width):
-    dots = "." * max(width - len(label) - len(value) - 3, 1)
-    return f"{label}: {dots} {value}"
+def span(text, cls=None, ident=None):
+    attrs = (f' class="{cls}"' if cls else "") + (f' id="{ident}"' if ident else "")
+    return f"<tspan{attrs}>{escape(text)}</tspan>" if attrs else escape(text)
 
 
-def info_lines(stats, age):
+def row(key, parts, width):
+    """'Key:' on the left, value parts right-aligned, spaces in between."""
+    value_len = sum(len(t) for t, *_ in parts)
+    spaces = " " * max(width - len(key) - 1 - value_len, 1)
+    return span(f"{key}:", "key") + spaces + "".join(span(*p) for p in parts)
+
+
+def title(text):
+    return escape(text) + " " + span("-" * (WIDTH - len(text) - 1), "cc")
+
+
+def info_lines(s, age):
+    f = lambda n: f"{n:,}"
     lines = []
     for item in INFO:
         if item is None:
             lines.append("")
         elif item == "STATS":
-            half = 28
-            lines.append(kv("Repos", f"{stats['repos']:,}", half) + " | " +
-                         kv("Stars", f"{stats['stars']:,}", WIDTH - half - 3))
-            lines.append(kv("Commits", f"{stats['commits']:,}", half) + " | " +
-                         kv("Followers", f"{stats['followers']:,}", WIDTH - half - 3))
+            lines.append(row("Repos", [(f(s["repos"]), "value", "repo_data"), (" {Contributed: ",),
+                                       (f(s["contrib"]), "value", "contrib_data"), ("}",)], HALF)
+                         + span(" | ", "cc") +
+                         row("Stars", [(f(s["stars"]), "value", "star_data")], WIDTH - HALF - 3))
+            lines.append(row("Commits", [(f(s["commits"]), "value", "commit_data")], HALF)
+                         + span(" | ", "cc") +
+                         row("Followers", [(f(s["followers"]), "value", "follower_data")], WIDTH - HALF - 3))
+            lines.append(row("Lines of Code on GitHub", [
+                (f(s["loc"]), "value", "loc_data"), (" ( ",),
+                (f(s["added"]) + "++", "add", "loc_add"), (", ",),
+                (f(s["deleted"]) + "--", "rem", "loc_del"), (" )",)], WIDTH))
         elif isinstance(item, str):
-            lines.append(f"{item} {'-' * (WIDTH - len(item) - 1)}")
+            lines.append(title(item))
         else:
-            label, _, value = item
-            if label == "Uptime":
-                if age is None:
-                    continue
+            key, ident, value = item
+            if value == "UPTIME":
                 value = age
-            lines.append(kv(label, value, WIDTH))
+            if value is None:
+                continue
+            lines.append(row(key, [(value, "value", ident)], WIDTH))
     return lines
 
 
-def load_photo(stats):
-    if os.path.exists(PHOTO):
-        return Image.open(PHOTO)
-    return Image.open(io.BytesIO(requests.get(stats["avatar"], timeout=30).content))
+def render(t, lines, n_portrait_rows):
+    first = PAD + 0.75 * FONT_SIZE                     # first baseline
+    top, bottom = PAD, first + (len(lines) - 1) * LINE_H + 0.25 * FONT_SIZE
+    info_x = round(ascii_portrait.X + ascii_portrait.portrait_width(n_portrait_rows, top, bottom) + GAP)
+    width = round(info_x + WIDTH * CHAR_W + PAD)
+    height = round(bottom + PAD)
+    info = "\n".join(f'<tspan x="{info_x}" y="{first + i * LINE_H:.0f}">{l}</tspan>'
+                     for i, l in enumerate(lines))
+    return f"""<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" width="{width}px" height="{height}px" font-family="{FONT}" font-size="{FONT_SIZE}px">
+<style>
+.key {{fill: {t['key']};}}
+.value {{fill: {t['value']};}}
+.cc {{fill: {t['cc']};}}
+.add {{fill: {t['add']};}}
+.rem {{fill: {t['rem']};}}
+text, tspan {{white-space: pre;}}
+</style>
+<rect width="{width}px" height="{height}px" fill="{t['bg']}" stroke="{t['border']}" rx="15"/>
+<g id="ascii-portrait"></g>
+<text id="info" x="{info_x}" y="{first:.0f}" fill="{t['text']}" xml:space="preserve" data-top="{top:.2f}" data-bottom="{bottom:.2f}">
+{info}
+</text>
+</svg>
+"""
+
+
+def build(stats):
+    age = uptime(BIRTHDAY) if BIRTHDAY else None
+    lines = info_lines(stats, age)
+    n_rows = len(ascii_portrait.ascii_rows(*ascii_portrait.load()))
+    for filename, theme in THEMES.items():
+        with open(filename, "w", encoding="utf-8") as fh:
+            fh.write(render(theme, lines, n_rows))
+    ascii_portrait.main()
 
 
 if __name__ == "__main__":
     stats = github_stats(USER_NAME)
-    age = uptime(BIRTHDAY) if BIRTHDAY else None
-    print(f"Uptime: {age} | Repos: {stats['repos']} | Stars: {stats['stars']} | "
-          f"Commits: {stats['commits']} | Followers: {stats['followers']}")
-
-    portrait(load_photo(stats)).save(CROPPED)
-    rows = ascii_portrait.ascii_rows(*ascii_portrait.load(CROPPED))
-    ascii_portrait.write_readme(ascii_portrait.compose(rows, info_lines(stats, age)))
-    print("README.md updated.")
+    print(stats)
+    build(stats)
+    print("SVG files updated.")
