@@ -1,15 +1,14 @@
 """
-Builds dark_mode.svg and light_mode.svg (neofetch-style profile card).
+Updates the neofetch-style card in README.md (selectable text, ```text block
+between <!-- STATS:START --> and <!-- STATS:END -->):
   - photo_cropped.png: tight head + shoulders crop of photo.jpg (or the GitHub
     avatar) with the background removed; ascii_portrait.py turns it into text
   - Uptime computed from the birth date
   - GitHub stats (repos, stars, commits, followers) from the GraphQL API
-Every dynamic value has an id in the SVG (age_data, repo_data, ...).
 """
 import datetime
 import io
 import os
-from xml.sax.saxutils import escape
 
 import cv2
 import numpy as np
@@ -48,21 +47,12 @@ INFO = [  # (label, id, value)  -- None = blank line, str = section header
 # --- Portrait crop ---
 CROPPED = "photo_cropped.png"
 FACE_RATIO = 0.70             # head height / image height
-CROP_ASPECT = 0.694           # crop width / height (50 cols x 36 rows with 2:1 character cells)
+CROP_ASPECT = 0.694           # crop width / height
 TOP_MARGIN = 0.02             # space kept above the hair (fraction of crop height)
 FACE_BOX = (205, 72, 110, 115)  # manual fallback (x, y, w, h) if no face is detected
 
-# --- Layout (px) ---
-INFO_LH, INFO_FONT = 26, 16
-PAD = 30
-GAP = 22                            # space between portrait and right column
-CHAR_W = 0.602 * INFO_FONT          # monospace advance of the right column
-WIDTH = 58                          # right column width (characters)
+WIDTH = 58                    # info column width (characters)
 
-THEMES = {
-    "dark_mode.svg":  dict(bg="#161b22", text="#c9d1d9", key="#ffa657", value="#a5d6ff", cc="#616e7f", border="#30363d"),
-    "light_mode.svg": dict(bg="#f6f8fa", text="#24292f", key="#953800", value="#0a3069", cc="#c2cfde", border="#d0d7de"),
-}
 # ================================================================
 
 TOKEN = os.environ.get("ACCESS_TOKEN") or os.environ.get("GITHUB_TOKEN")
@@ -205,12 +195,10 @@ def portrait(img):
                               Image.fromarray(alpha)))
 
 
-# ------------------------------------------------------------- SVG
-def kv(label, ident, value, width):
-    dots = " " + "." * max(width - len(label) - len(value) - 3, 1) + " "
-    return (f'<tspan class="key">{escape(label)}</tspan>:'
-            f'<tspan class="cc" id="{ident}_dots">{dots}</tspan>'
-            f'<tspan class="value" id="{ident}">{escape(value)}</tspan>')
+# ------------------------------------------------------------- Info column
+def kv(label, value, width):
+    dots = "." * max(width - len(label) - len(value) - 3, 1)
+    return f"{label}: {dots} {value}"
 
 
 def info_lines(stats, age):
@@ -220,47 +208,20 @@ def info_lines(stats, age):
             lines.append("")
         elif item == "STATS":
             half = 28
-            lines.append(kv("Repos", "repo_data", f"{stats['repos']:,}", half) + " | " +
-                         kv("Stars", "star_data", f"{stats['stars']:,}", WIDTH - half - 3))
-            lines.append(kv("Commits", "commit_data", f"{stats['commits']:,}", half) + " | " +
-                         kv("Followers", "follower_data", f"{stats['followers']:,}", WIDTH - half - 3))
+            lines.append(kv("Repos", f"{stats['repos']:,}", half) + " | " +
+                         kv("Stars", f"{stats['stars']:,}", WIDTH - half - 3))
+            lines.append(kv("Commits", f"{stats['commits']:,}", half) + " | " +
+                         kv("Followers", f"{stats['followers']:,}", WIDTH - half - 3))
         elif isinstance(item, str):
-            lines.append(f'{escape(item)} <tspan class="cc">{"-" * (WIDTH - len(item) - 1)}</tspan>')
+            lines.append(f"{item} {'-' * (WIDTH - len(item) - 1)}")
         else:
-            label, ident, value = item
-            if ident == "age_data":
+            label, _, value = item
+            if label == "Uptime":
                 if age is None:
                     continue
                 value = age
-            lines.append(kv(label, ident, value, WIDTH))
+            lines.append(kv(label, value, WIDTH))
     return lines
-
-
-def render(t, lines):
-    first = PAD + 12
-    height = first + (len(lines) - 1) * INFO_LH + PAD
-    # Portrait width follows from its height (= right column height) and the character aspect
-    rows = round(ascii_portrait.COLS / CROP_ASPECT * ascii_portrait.CHAR_ASPECT)
-    lh = ((len(lines) - 1) * INFO_LH + INFO_FONT) / rows
-    INFO_X = round(ascii_portrait.X + ascii_portrait.COLS * lh * ascii_portrait.CHAR_ASPECT + GAP)
-    CARD_W = round(INFO_X + WIDTH * CHAR_W + 20)
-    info = "\n".join(f'<tspan x="{INFO_X}" y="{first + i * INFO_LH}">{l}</tspan>' for i, l in enumerate(lines))
-    return f"""<?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" font-family="ConsolasFallback,Consolas,'DejaVu Sans Mono','Courier New',monospace" width="{CARD_W}px" height="{height}px" font-size="{INFO_FONT}px">
-<style>
-@font-face {{ src: local('Consolas'), local('Consolas Bold'); font-family: 'ConsolasFallback'; font-display: swap; -webkit-size-adjust: 109%; size-adjust: 109%; }}
-.key {{fill: {t['key']};}}
-.value {{fill: {t['value']};}}
-.cc {{fill: {t['cc']};}}
-text, tspan {{white-space: pre;}}
-</style>
-<rect width="{CARD_W}px" height="{height}px" fill="{t['bg']}" stroke="{t['border']}" rx="15"/>
-<g id="ascii-portrait"></g>
-<text id="info" x="{INFO_X}" y="{first}" fill="{t['text']}" xml:space="preserve">
-{info}
-</text>
-</svg>
-"""
 
 
 def load_photo(stats):
@@ -276,9 +237,6 @@ if __name__ == "__main__":
           f"Commits: {stats['commits']} | Followers: {stats['followers']}")
 
     portrait(load_photo(stats)).save(CROPPED)
-    lines = info_lines(stats, age)
-    for filename, theme in THEMES.items():
-        with open(filename, "w", encoding="utf-8") as f:
-            f.write(render(theme, lines))
-    ascii_portrait.main()  # writes the ASCII block from photo_cropped.png
-    print("SVG files updated.")
+    rows = ascii_portrait.ascii_rows(*ascii_portrait.load(CROPPED))
+    ascii_portrait.write_readme(ascii_portrait.compose(rows, info_lines(stats, age)))
+    print("README.md updated.")
