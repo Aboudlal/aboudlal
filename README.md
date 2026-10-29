@@ -1,14 +1,3 @@
-<a href="https://github.com/aboudlal">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="dark_mode.svg">
-    <source media="(prefers-color-scheme: light)" srcset="light_mode.svg">
-    <img alt="Abdellah Boudlal - Data Analyst" src="dark_mode.svg">
-  </picture>
-</a>
-
-<details>
-<summary>Text version</summary>
-
 <!-- PROFILE:START -->
 ```text
         =---::::::::::-=+               abdellah@boudlal -------------------------------------------
@@ -34,5 +23,3 @@
                                         Lines of Code on GitHub:  921,290 ( 1,770,889++, 849,599-- )
 ```
 <!-- PROFILE:END -->
-
-</details>
