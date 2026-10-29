@@ -15,9 +15,9 @@ from PIL import Image
 
 SOURCE = "photo_cropped.png"
 CHARSET = "@%#*+=-:. "      # densest -> lightest
-COLS = 60                   # portrait width in characters
+COLS = 50                   # portrait width in characters
 CHAR_ASPECT = 0.5           # a character cell is ~2x taller than wide
-CLAHE_CLIP, CLAHE_GRID = 3.0, 8
+CLAHE_CLIP, CLAHE_GRID = 3.0, 6
 SVGS = {                    # file: (text colour, invert)
     "dark_mode.svg": ("#c9d1d9", False),   # light areas = dense characters
     "light_mode.svg": ("#24292f", True),   # dark areas = dense characters
@@ -35,8 +35,10 @@ def ascii_rows(gray, alpha, invert):
     h, w = gray.shape
     rows = max(1, round(COLS * h / w * CHAR_ASPECT))
 
-    # Local contrast on the face (CLAHE), then shrink to one pixel per character
-    eq = cv2.createCLAHE(clipLimit=CLAHE_CLIP, tileGridSize=(CLAHE_GRID, CLAHE_GRID)).apply(gray)
+    # Local contrast (CLAHE) on the subject only, so eyes, nose and beard stand out
+    fill = int(np.median(gray[alpha > 127])) if (alpha > 127).any() else 0
+    work = np.where(alpha > 127, gray, fill).astype(np.uint8)   # neutral background: no halo
+    eq = cv2.createCLAHE(clipLimit=CLAHE_CLIP, tileGridSize=(CLAHE_GRID, CLAHE_GRID)).apply(work)
     small = cv2.resize(eq, (COLS, rows), interpolation=cv2.INTER_AREA).astype(np.float64)
     fg = cv2.resize(alpha, (COLS, rows), interpolation=cv2.INTER_AREA) > 127
 
