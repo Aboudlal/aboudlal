@@ -1,6 +1,10 @@
 """
-Builds dark_mode.svg and light_mode.svg: a neofetch-style card with an ASCII
-portrait (from photo_cropped.png, see ascii_portrait.py) and live GitHub stats.
+Builds the neofetch-style profile card:
+  - dark_mode.svg / light_mode.svg: coloured card shown in README.md
+  - README.md: selectable text version (```text block between
+    <!-- PROFILE:START --> and <!-- PROFILE:END -->), rebuilt on every run so
+    values stay aligned on the right edge
+ASCII portrait from photo_cropped.png (see ascii_portrait.py), live GitHub stats.
 
 Stats come from the GitHub GraphQL API (ACCESS_TOKEN secret, or the workflow's
 built-in token). Every dynamic value has an id in the SVG (age_data, repo_data,
@@ -214,18 +218,53 @@ text, tspan {{white-space: pre;}}
 """
 
 
+# ------------------------------------------------------------- README text version
+def text_row(key, value, width):
+    return f"{key}:" + " " * max(width - len(key) - 1 - len(value), 1) + value
+
+
+def text_lines(s, age):
+    f = lambda n: f"{n:,}"
+    lines = []
+    for item in INFO:
+        if item is None:
+            lines.append("")
+        elif item == "STATS":
+            right = WIDTH - HALF - 3
+            lines.append(text_row("Repos", f"{f(s['repos'])} {{Contributed: {f(s['contrib'])}}}", HALF)
+                         + " | " + text_row("Stars", f(s["stars"]), right))
+            lines.append(text_row("Commits", f(s["commits"]), HALF) + " | "
+                         + text_row("Followers", f(s["followers"]), right))
+            lines.append(text_row("Lines of Code on GitHub",
+                                  f"{f(s['loc'])} ( {f(s['added'])}++, {f(s['deleted'])}-- )", WIDTH))
+        elif isinstance(item, str):
+            lines.append(f"{item} " + "-" * (WIDTH - len(item) - 1))
+        else:
+            key, _, value = item
+            if value == "UPTIME":
+                value = age
+            if value is not None:
+                lines.append(text_row(key, value, WIDTH))
+    return lines
+
+
 def build(stats):
     age = uptime(BIRTHDAY) if BIRTHDAY else None
+    gray, alpha = ascii_portrait.load()
+    # coloured SVG cards
     lines = info_lines(stats, age)
-    n_rows = len(ascii_portrait.ascii_rows(*ascii_portrait.load()))
+    n_rows = len(ascii_portrait.ascii_rows(gray, alpha))
     for filename, theme in THEMES.items():
         with open(filename, "w", encoding="utf-8") as fh:
             fh.write(render(theme, lines, n_rows))
-    ascii_portrait.main()
+    ascii_portrait.write_svgs(gray, alpha)
+    # selectable text version in README.md
+    ascii_portrait.write_readme(ascii_portrait.compose(ascii_portrait.text_rows(gray, alpha),
+                                                       text_lines(stats, age)))
 
 
 if __name__ == "__main__":
     stats = github_stats(USER_NAME)
     print(stats)
     build(stats)
-    print("SVG files updated.")
+    print("SVG files and README.md updated.")

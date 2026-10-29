@@ -5,3 +5,11 @@
     <img alt="Abdellah Boudlal - Data Analyst" src="dark_mode.svg">
   </picture>
 </a>
+
+<details>
+<summary>Text version</summary>
+
+<!-- PROFILE:START -->
+<!-- PROFILE:END -->
+
+</details>
