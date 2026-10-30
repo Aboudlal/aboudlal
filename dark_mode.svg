@@ -78,7 +78,7 @@ text, tspan {white-space: pre;}
 <tspan x="414" y="416"></tspan>
 <tspan x="414" y="440">GitHub Stats <tspan class="cc">-----------------------------------------------</tspan></tspan>
 <tspan x="414" y="464"><tspan class="key">Repos:</tspan>    <tspan class="value" id="repo_data">31</tspan> {Contributed: <tspan class="value" id="contrib_data">21</tspan>}<tspan class="cc"> | </tspan><tspan class="key">Stars:</tspan>                    <tspan class="value" id="star_data">0</tspan></tspan>
-<tspan x="414" y="488"><tspan class="key">Commits:</tspan>                   <tspan class="value" id="commit_data">280</tspan><tspan class="cc"> | </tspan><tspan class="key">Followers:</tspan>                <tspan class="value" id="follower_data">1</tspan></tspan>
-<tspan x="414" y="512"><tspan class="key">Lines of Code on GitHub:</tspan>  <tspan class="value" id="loc_data">921,290</tspan> ( <tspan class="add" id="loc_add">1,770,889++</tspan>, <tspan class="rem" id="loc_del">849,599--</tspan> )</tspan>
+<tspan x="414" y="488"><tspan class="key">Commits:</tspan>                   <tspan class="value" id="commit_data">283</tspan><tspan class="cc"> | </tspan><tspan class="key">Followers:</tspan>                <tspan class="value" id="follower_data">1</tspan></tspan>
+<tspan x="414" y="512"><tspan class="key">Lines of Code on GitHub:</tspan>  <tspan class="value" id="loc_data">921,289</tspan> ( <tspan class="add" id="loc_add">1,771,079++</tspan>, <tspan class="rem" id="loc_del">849,790--</tspan> )</tspan>
 </text>
 </svg>
