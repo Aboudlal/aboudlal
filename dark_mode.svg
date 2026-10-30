@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<svg xmlns="http://www.w3.org/2000/svg" width="1012px" height="536px" font-family="Consolas,'DejaVu Sans Mono','Courier New',monospace" font-size="16px">
+<svg xmlns="http://www.w3.org/2000/svg" width="1191px" height="776px" font-family="Consolas,'DejaVu Sans Mono','Courier New',monospace" font-size="16px">
 <style>
 .key {fill: #ffa657;}
 .value {fill: #a5d6ff;}
@@ -8,77 +8,87 @@
 .rem {fill: #f85149;}
 text, tspan {white-space: pre;}
 </style>
-<rect width="1012px" height="536px" fill="#161b22" stroke="#30363d" rx="15"/>
-<g id="ascii-portrait"><text x="20" y="20.00" fill="#c9d1d9" font-family="Consolas,'DejaVu Sans Mono','Courier New',monospace" font-size="8.79px" xml:space="preserve">
-<tspan x="20" y="28.44" textLength="369.36" lengthAdjust="spacingAndGlyphs">                   +  +--------------------=*                         </tspan>
-<tspan x="20" y="39.00" textLength="369.36" lengthAdjust="spacingAndGlyphs">               =-::::::::::::-:::::::::::::---=                       </tspan>
-<tspan x="20" y="49.55" textLength="369.36" lengthAdjust="spacingAndGlyphs">              =::::-:-::::-:::::::::::--::-------=+                   </tspan>
-<tspan x="20" y="60.10" textLength="369.36" lengthAdjust="spacingAndGlyphs">              +:::----::---::----:-----------------=+++               </tspan>
-<tspan x="20" y="70.66" textLength="369.36" lengthAdjust="spacingAndGlyphs">             *=:::-:::-==--------:-:----------------====+*            </tspan>
-<tspan x="20" y="81.21" textLength="369.36" lengthAdjust="spacingAndGlyphs">              -::::::::-=---=-----:---------------:-=++:-=            </tspan>
-<tspan x="20" y="91.76" textLength="369.36" lengthAdjust="spacingAndGlyphs">              =-:::----------------====-====-===--=-==----+           </tspan>
-<tspan x="20" y="102.31" textLength="369.36" lengthAdjust="spacingAndGlyphs">              -::::::--:-::------====--===----==----:::::-=*          </tspan>
-<tspan x="20" y="112.87" textLength="369.36" lengthAdjust="spacingAndGlyphs">             =::::--==--------------------::---::::::::--:-=          </tspan>
-<tspan x="20" y="123.42" textLength="369.36" lengthAdjust="spacingAndGlyphs">            +-----===----::::::::--------::::-:-:--:::-::::-          </tspan>
-<tspan x="20" y="133.97" textLength="369.36" lengthAdjust="spacingAndGlyphs">            ----=+++===++++===------==--------:::::::::::::-+         </tspan>
-<tspan x="20" y="144.53" textLength="369.36" lengthAdjust="spacingAndGlyphs">           =:--=+#######%%##***+=+==------=++++==-==--------=         </tspan>
-<tspan x="20" y="155.08" textLength="369.36" lengthAdjust="spacingAndGlyphs">           ---=+*#%%%%%%%%@@@%%%%%###****####%###*#**++*+=--=         </tspan>
-<tspan x="20" y="165.63" textLength="369.36" lengthAdjust="spacingAndGlyphs">           --==+*####%%%%%@@@@@@@@@@@@@@@%@%@@@%%%%#%###*+=--         </tspan>
-<tspan x="20" y="176.19" textLength="369.36" lengthAdjust="spacingAndGlyphs">          =--=++*####%%%%%%%@@@@@@@@@@@@@@@%@@%%%%%#%%###*+--=        </tspan>
-<tspan x="20" y="186.74" textLength="369.36" lengthAdjust="spacingAndGlyphs">          =-==+**#####%%%%%%@@@@@@@@@@@@@@@%@@%%%%%##%###*+=-         </tspan>
-<tspan x="20" y="197.29" textLength="369.36" lengthAdjust="spacingAndGlyphs">          --==+***####%%%%%%%%%@@@@@@@@@@%%%%%%%%########*+=-         </tspan>
-<tspan x="20" y="207.85" textLength="369.36" lengthAdjust="spacingAndGlyphs">          -:-=*****###%##%%%%%@@@@@@@@@@@@%@%###%%#%%##*#*+=-         </tspan>
-<tspan x="20" y="218.40" textLength="369.36" lengthAdjust="spacingAndGlyphs">          --=+**+***+++*####%%@@@@@@@@@@@@@%%%%%#######**++--         </tspan>
-<tspan x="20" y="228.95" textLength="369.36" lengthAdjust="spacingAndGlyphs">           -=+*+=-:.....::--=*##%%@@@@@@@%%##++++++++**+**=:-         </tspan>
-<tspan x="20" y="239.51" textLength="369.36" lengthAdjust="spacingAndGlyphs">        *#*:-**+-:::------::::=+#%%%%%%%%*+-::::...:::--++=:=         </tspan>
-<tspan x="20" y="250.06" textLength="369.36" lengthAdjust="spacingAndGlyphs">      *+*%#--+*+=====----::---==+###%%##*+=----==++=-::-=+=-*         </tspan>
-<tspan x="20" y="260.61" textLength="369.36" lengthAdjust="spacingAndGlyphs">      ##**#+=****+=--=+-:.:+*=-=+*#%%%#+===--::::---====+*=+#*+       </tspan>
-<tspan x="20" y="271.17" textLength="369.36" lengthAdjust="spacingAndGlyphs">       %#%*==**####*++++==+#**+++*#%%%*+++**+:::=*--==++**+####       </tspan>
-<tspan x="20" y="281.72" textLength="369.36" lengthAdjust="spacingAndGlyphs">       %#%*==**###%############++*#%%%*+*#****++++++*####*+#%##       </tspan>
-<tspan x="20" y="292.27" textLength="369.36" lengthAdjust="spacingAndGlyphs">       #%%*==+*###%%%%%%%%%%%%#***#%%%#***###############**%%%        </tspan>
-<tspan x="20" y="302.83" textLength="369.36" lengthAdjust="spacingAndGlyphs">        #%*=-+*###%%%%%%%%@%%##****%%%#***#%%%%%%%%%%%##*+*%%*        </tspan>
-<tspan x="20" y="313.38" textLength="369.36" lengthAdjust="spacingAndGlyphs">         *+=-=+**##%%%%@@@@@%%#+**#####****#%%%%%%%%%#**+=+#*         </tspan>
-<tspan x="20" y="323.93" textLength="369.36" lengthAdjust="spacingAndGlyphs">          +=--+**##%%%%@@%%%%#****#%%%##**#%%%@@@%%%%##*+-=*          </tspan>
-<tspan x="20" y="334.49" textLength="369.36" lengthAdjust="spacingAndGlyphs">           *=:=+**##%%%%%@%%#**##*#%@@%#**###%%@@%%%##*+=-+           </tspan>
-<tspan x="20" y="345.04" textLength="369.36" lengthAdjust="spacingAndGlyphs">             -:=+**##%%%%%%%*+====+#%%#+==+####%%%%##**=:=            </tspan>
-<tspan x="20" y="355.59" textLength="369.36" lengthAdjust="spacingAndGlyphs">              :-=+*######*#**+==----==-.:-+*****##%##*+-:             </tspan>
-<tspan x="20" y="366.14" textLength="369.36" lengthAdjust="spacingAndGlyphs">              =::=+**#*=--::-:.:...:::....:-::-=+###*+-:              </tspan>
-<tspan x="20" y="376.70" textLength="369.36" lengthAdjust="spacingAndGlyphs">               -.:-+**=::::.::--=====+===-:-..::-+#*=:.:              </tspan>
-<tspan x="20" y="387.25" textLength="369.36" lengthAdjust="spacingAndGlyphs">                :..:--:-=***++=++****#**+++=+*+=-=+=::.=              </tspan>
-<tspan x="20" y="397.80" textLength="369.36" lengthAdjust="spacingAndGlyphs">                -....::-+#%%#***###%%%%#*****##+=--:..-               </tspan>
-<tspan x="20" y="408.36" textLength="369.36" lengthAdjust="spacingAndGlyphs">                 -.....:+#%%%##*+=+++++****#***=:....-                </tspan>
-<tspan x="20" y="418.91" textLength="369.36" lengthAdjust="spacingAndGlyphs">                 +:....:-+#%%%%%#+:::-+*###%##+:....:                 </tspan>
-<tspan x="20" y="429.46" textLength="369.36" lengthAdjust="spacingAndGlyphs">               +++=-:...:-+#%@@@%%*--+#%%%@%%*-...:---                </tspan>
-<tspan x="20" y="440.02" textLength="369.36" lengthAdjust="spacingAndGlyphs">              +:-+++=-....::=****++-:-=++**++-...:=+=.:               </tspan>
-<tspan x="20" y="450.57" textLength="369.36" lengthAdjust="spacingAndGlyphs">             =::-***+=-:....::----:::.::--::...:-***=:.:=             </tspan>
-<tspan x="20" y="461.12" textLength="369.36" lengthAdjust="spacingAndGlyphs">        *+*+-:.:-*###*+=-::.............:....:-+**#*=:..:--=+         </tspan>
-<tspan x="20" y="471.68" textLength="369.36" lengthAdjust="spacingAndGlyphs">      ##+--=:.:--+#####*+=--::............:-=+*####*+-::.:---=+**     </tspan>
-<tspan x="20" y="482.23" textLength="369.36" lengthAdjust="spacingAndGlyphs">  *+==+***-::::--+*######*+==-------:::--=+**#######*=------=*++:-++  </tspan>
-<tspan x="20" y="492.78" textLength="369.36" lengthAdjust="spacingAndGlyphs">-::==-=+*#=-----=+**###%####**+++++++++++**###%%%###*+-=---+**+::*##* </tspan>
-<tspan x="20" y="503.34" textLength="369.36" lengthAdjust="spacingAndGlyphs">:.::--===+=-==-=*****###%#%%#################%#######*=+==++#*=-+**+  </tspan>
-<tspan x="20" y="513.89" textLength="369.36" lengthAdjust="spacingAndGlyphs"> -..:-==---+**=+##*#**####%%%%###################*####**++--+**###+   </tspan>
+<rect width="1191px" height="776px" fill="#161b22" stroke="#30363d" rx="15"/>
+<g id="ascii-portrait"><text x="20" y="20.00" fill="#c9d1d9" font-family="Consolas,'DejaVu Sans Mono','Courier New',monospace" font-size="13.05px" xml:space="preserve">
+<tspan x="20" y="32.53" textLength="548.09" lengthAdjust="spacingAndGlyphs">                   +  +--------------------=*                         </tspan>
+<tspan x="20" y="48.19" textLength="548.09" lengthAdjust="spacingAndGlyphs">               =-::::::::::::-:::::::::::::---=                       </tspan>
+<tspan x="20" y="63.85" textLength="548.09" lengthAdjust="spacingAndGlyphs">              =::::-:-::::-:::::::::::--::-------=+                   </tspan>
+<tspan x="20" y="79.51" textLength="548.09" lengthAdjust="spacingAndGlyphs">              +:::----::---::----:-----------------=+++               </tspan>
+<tspan x="20" y="95.17" textLength="548.09" lengthAdjust="spacingAndGlyphs">             *=:::-:::-==--------:-:----------------====+*            </tspan>
+<tspan x="20" y="110.83" textLength="548.09" lengthAdjust="spacingAndGlyphs">              -::::::::-=---=-----:---------------:-=++:-=            </tspan>
+<tspan x="20" y="126.49" textLength="548.09" lengthAdjust="spacingAndGlyphs">              =-:::----------------====-====-===--=-==----+           </tspan>
+<tspan x="20" y="142.14" textLength="548.09" lengthAdjust="spacingAndGlyphs">              -::::::--:-::------====--===----==----:::::-=*          </tspan>
+<tspan x="20" y="157.80" textLength="548.09" lengthAdjust="spacingAndGlyphs">             =::::--==--------------------::---::::::::--:-=          </tspan>
+<tspan x="20" y="173.46" textLength="548.09" lengthAdjust="spacingAndGlyphs">            +-----===----::::::::--------::::-:-:--:::-::::-          </tspan>
+<tspan x="20" y="189.12" textLength="548.09" lengthAdjust="spacingAndGlyphs">            ----=+++===++++===------==--------:::::::::::::-+         </tspan>
+<tspan x="20" y="204.78" textLength="548.09" lengthAdjust="spacingAndGlyphs">           =:--=+#######%%##***+=+==------=++++==-==--------=         </tspan>
+<tspan x="20" y="220.44" textLength="548.09" lengthAdjust="spacingAndGlyphs">           ---=+*#%%%%%%%%@@@%%%%%###****####%###*#**++*+=--=         </tspan>
+<tspan x="20" y="236.10" textLength="548.09" lengthAdjust="spacingAndGlyphs">           --==+*####%%%%%@@@@@@@@@@@@@@@%@%@@@%%%%#%###*+=--         </tspan>
+<tspan x="20" y="251.76" textLength="548.09" lengthAdjust="spacingAndGlyphs">          =--=++*####%%%%%%%@@@@@@@@@@@@@@@%@@%%%%%#%%###*+--=        </tspan>
+<tspan x="20" y="267.42" textLength="548.09" lengthAdjust="spacingAndGlyphs">          =-==+**#####%%%%%%@@@@@@@@@@@@@@@%@@%%%%%##%###*+=-         </tspan>
+<tspan x="20" y="283.08" textLength="548.09" lengthAdjust="spacingAndGlyphs">          --==+***####%%%%%%%%%@@@@@@@@@@%%%%%%%%########*+=-         </tspan>
+<tspan x="20" y="298.74" textLength="548.09" lengthAdjust="spacingAndGlyphs">          -:-=*****###%##%%%%%@@@@@@@@@@@@%@%###%%#%%##*#*+=-         </tspan>
+<tspan x="20" y="314.40" textLength="548.09" lengthAdjust="spacingAndGlyphs">          --=+**+***+++*####%%@@@@@@@@@@@@@%%%%%#######**++--         </tspan>
+<tspan x="20" y="330.06" textLength="548.09" lengthAdjust="spacingAndGlyphs">           -=+*+=-:.....::--=*##%%@@@@@@@%%##++++++++**+**=:-         </tspan>
+<tspan x="20" y="345.72" textLength="548.09" lengthAdjust="spacingAndGlyphs">        *#*:-**+-:::------::::=+#%%%%%%%%*+-::::...:::--++=:=         </tspan>
+<tspan x="20" y="361.38" textLength="548.09" lengthAdjust="spacingAndGlyphs">      *+*%#--+*+=====----::---==+###%%##*+=----==++=-::-=+=-*         </tspan>
+<tspan x="20" y="377.04" textLength="548.09" lengthAdjust="spacingAndGlyphs">      ##**#+=****+=--=+-:.:+*=-=+*#%%%#+===--::::---====+*=+#*+       </tspan>
+<tspan x="20" y="392.70" textLength="548.09" lengthAdjust="spacingAndGlyphs">       %#%*==**####*++++==+#**+++*#%%%*+++**+:::=*--==++**+####       </tspan>
+<tspan x="20" y="408.36" textLength="548.09" lengthAdjust="spacingAndGlyphs">       %#%*==**###%############++*#%%%*+*#****++++++*####*+#%##       </tspan>
+<tspan x="20" y="424.02" textLength="548.09" lengthAdjust="spacingAndGlyphs">       #%%*==+*###%%%%%%%%%%%%#***#%%%#***###############**%%%        </tspan>
+<tspan x="20" y="439.68" textLength="548.09" lengthAdjust="spacingAndGlyphs">        #%*=-+*###%%%%%%%%@%%##****%%%#***#%%%%%%%%%%%##*+*%%*        </tspan>
+<tspan x="20" y="455.34" textLength="548.09" lengthAdjust="spacingAndGlyphs">         *+=-=+**##%%%%@@@@@%%#+**#####****#%%%%%%%%%#**+=+#*         </tspan>
+<tspan x="20" y="471.00" textLength="548.09" lengthAdjust="spacingAndGlyphs">          +=--+**##%%%%@@%%%%#****#%%%##**#%%%@@@%%%%##*+-=*          </tspan>
+<tspan x="20" y="486.66" textLength="548.09" lengthAdjust="spacingAndGlyphs">           *=:=+**##%%%%%@%%#**##*#%@@%#**###%%@@%%%##*+=-+           </tspan>
+<tspan x="20" y="502.31" textLength="548.09" lengthAdjust="spacingAndGlyphs">             -:=+**##%%%%%%%*+====+#%%#+==+####%%%%##**=:=            </tspan>
+<tspan x="20" y="517.97" textLength="548.09" lengthAdjust="spacingAndGlyphs">              :-=+*######*#**+==----==-.:-+*****##%##*+-:             </tspan>
+<tspan x="20" y="533.63" textLength="548.09" lengthAdjust="spacingAndGlyphs">              =::=+**#*=--::-:.:...:::....:-::-=+###*+-:              </tspan>
+<tspan x="20" y="549.29" textLength="548.09" lengthAdjust="spacingAndGlyphs">               -.:-+**=::::.::--=====+===-:-..::-+#*=:.:              </tspan>
+<tspan x="20" y="564.95" textLength="548.09" lengthAdjust="spacingAndGlyphs">                :..:--:-=***++=++****#**+++=+*+=-=+=::.=              </tspan>
+<tspan x="20" y="580.61" textLength="548.09" lengthAdjust="spacingAndGlyphs">                -....::-+#%%#***###%%%%#*****##+=--:..-               </tspan>
+<tspan x="20" y="596.27" textLength="548.09" lengthAdjust="spacingAndGlyphs">                 -.....:+#%%%##*+=+++++****#***=:....-                </tspan>
+<tspan x="20" y="611.93" textLength="548.09" lengthAdjust="spacingAndGlyphs">                 +:....:-+#%%%%%#+:::-+*###%##+:....:                 </tspan>
+<tspan x="20" y="627.59" textLength="548.09" lengthAdjust="spacingAndGlyphs">               +++=-:...:-+#%@@@%%*--+#%%%@%%*-...:---                </tspan>
+<tspan x="20" y="643.25" textLength="548.09" lengthAdjust="spacingAndGlyphs">              +:-+++=-....::=****++-:-=++**++-...:=+=.:               </tspan>
+<tspan x="20" y="658.91" textLength="548.09" lengthAdjust="spacingAndGlyphs">             =::-***+=-:....::----:::.::--::...:-***=:.:=             </tspan>
+<tspan x="20" y="674.57" textLength="548.09" lengthAdjust="spacingAndGlyphs">        *+*+-:.:-*###*+=-::.............:....:-+**#*=:..:--=+         </tspan>
+<tspan x="20" y="690.23" textLength="548.09" lengthAdjust="spacingAndGlyphs">      ##+--=:.:--+#####*+=--::............:-=+*####*+-::.:---=+**     </tspan>
+<tspan x="20" y="705.89" textLength="548.09" lengthAdjust="spacingAndGlyphs">  *+==+***-::::--+*######*+==-------:::--=+**#######*=------=*++:-++  </tspan>
+<tspan x="20" y="721.55" textLength="548.09" lengthAdjust="spacingAndGlyphs">-::==-=+*#=-----=+**###%####**+++++++++++**###%%%###*+-=---+**+::*##* </tspan>
+<tspan x="20" y="737.21" textLength="548.09" lengthAdjust="spacingAndGlyphs">:.::--===+=-==-=*****###%#%%#################%#######*=+==++#*=-+**+  </tspan>
+<tspan x="20" y="752.87" textLength="548.09" lengthAdjust="spacingAndGlyphs"> -..:-==---+**=+##*#**####%%%%###################*####**++--+**###+   </tspan>
 </text></g>
-<text id="info" x="414" y="32" fill="#c9d1d9" xml:space="preserve" data-top="20.00" data-bottom="516.00">
-<tspan x="414" y="32">abdellah@boudlal <tspan class="cc">-------------------------------------------</tspan></tspan>
-<tspan x="414" y="56"><tspan class="key">OS:</tspan>                                   <tspan class="value" id="os">Windows 11, iOS, Linux</tspan></tspan>
-<tspan x="414" y="80"><tspan class="key">Host:</tspan>                       <tspan class="value" id="host">Elite Visa (Founder, since 2018)</tspan></tspan>
-<tspan x="414" y="104"><tspan class="key">Kernel:</tspan>                                         <tspan class="value" id="kernel">Data Analyst</tspan></tspan>
-<tspan x="414" y="128"><tspan class="key">IDE:</tspan>                       <tspan class="value" id="ide">VSCode, Jupyter, Power BI Desktop</tspan></tspan>
-<tspan x="414" y="152"></tspan>
-<tspan x="414" y="176"><tspan class="key">Languages.Programming:</tspan>                      <tspan class="value" id="lang_prog">SQL, Python, DAX</tspan></tspan>
-<tspan x="414" y="200"><tspan class="key">Languages.Computer:</tspan>                <tspan class="value" id="lang_comp">HTML, CSS, JSON, Markdown</tspan></tspan>
-<tspan x="414" y="224"><tspan class="key">Languages.Real:</tspan>                      <tspan class="value" id="lang_real">French, Arabic, English</tspan></tspan>
-<tspan x="414" y="248"></tspan>
-<tspan x="414" y="272"><tspan class="key">Tools.Data:</tspan>                         <tspan class="value" id="tools_data">Power BI, Excel, Tableau</tspan></tspan>
-<tspan x="414" y="296"><tspan class="key">Tools.Libraries:</tspan>                   <tspan class="value" id="tools_libs">Pandas, NumPy, Matplotlib</tspan></tspan>
-<tspan x="414" y="320"></tspan>
-<tspan x="414" y="344">Contact <tspan class="cc">----------------------------------------------------</tspan></tspan>
-<tspan x="414" y="368"><tspan class="key">Website:</tspan>                                 <tspan class="value" id="website">abdellahboudlal.com</tspan></tspan>
-<tspan x="414" y="392"><tspan class="key">LinkedIn:</tspan>                                           <tspan class="value" id="linkedin">aboudlal</tspan></tspan>
-<tspan x="414" y="416"></tspan>
-<tspan x="414" y="440">GitHub Stats <tspan class="cc">-----------------------------------------------</tspan></tspan>
-<tspan x="414" y="464"><tspan class="key">Repos:</tspan>    <tspan class="value" id="repo_data">31</tspan> {Contributed: <tspan class="value" id="contrib_data">21</tspan>}<tspan class="cc"> | </tspan><tspan class="key">Stars:</tspan>                    <tspan class="value" id="star_data">0</tspan></tspan>
-<tspan x="414" y="488"><tspan class="key">Commits:</tspan>                   <tspan class="value" id="commit_data">284</tspan><tspan class="cc"> | </tspan><tspan class="key">Followers:</tspan>                <tspan class="value" id="follower_data">1</tspan></tspan>
-<tspan x="414" y="512"><tspan class="key">Lines of Code on GitHub:</tspan>  <tspan class="value" id="loc_data">921,289</tspan> ( <tspan class="add" id="loc_add">1,771,083++</tspan>, <tspan class="rem" id="loc_del">849,794--</tspan> )</tspan>
+<text id="info" x="593" y="32" fill="#c9d1d9" xml:space="preserve" data-top="20.00" data-bottom="756.00">
+<tspan x="593" y="32">abdellah@boudlal <tspan class="cc">-------------------------------------------</tspan></tspan>
+<tspan x="593" y="56"><tspan class="key">OS:</tspan>                                   <tspan class="value" id="os">Windows 11, Linux, iOS</tspan></tspan>
+<tspan x="593" y="80"><tspan class="key">Host:</tspan>                       <tspan class="value" id="host">Elite Visa (Founder, since 2018)</tspan></tspan>
+<tspan x="593" y="104"><tspan class="key">Role:</tspan>                             <tspan class="value" id="role">Data Analyst, AI Workflows</tspan></tspan>
+<tspan x="593" y="128"><tspan class="key">Focus:</tspan>                     <tspan class="value" id="focus">BI, Data Modeling, LLM Automation</tspan></tspan>
+<tspan x="593" y="152"><tspan class="key">IDE:</tspan>                           <tspan class="value" id="ide">VS Code, Claude Code, Jupyter</tspan></tspan>
+<tspan x="593" y="176"></tspan>
+<tspan x="593" y="200"><tspan class="key">Languages.Code:</tspan>            <tspan class="value" id="lang_code">Python, SQL, DAX, Power Query (M)</tspan></tspan>
+<tspan x="593" y="224"><tspan class="key">Languages.Real:</tspan>              <tspan class="value" id="lang_real">French, Arabic, Berber, English</tspan></tspan>
+<tspan x="593" y="248"></tspan>
+<tspan x="593" y="272"><tspan class="key">Stack.BI:</tspan>                <tspan class="value" id="stack_bi">Power BI, Microsoft Fabric, Tableau</tspan></tspan>
+<tspan x="593" y="296"><tspan class="key">Stack.Data:</tspan>                      <tspan class="value" id="stack_data">DuckDB, dbt, Polars, Pandas</tspan></tspan>
+<tspan x="593" y="320"><tspan class="key">Stack.Cloud:</tspan>                         <tspan class="value" id="stack_cloud">Azure, Fabric Lakehouse</tspan></tspan>
+<tspan x="593" y="344"><tspan class="key">Stack.Viz:</tspan>                          <tspan class="value" id="stack_viz">Plotly, Streamlit, Deneb</tspan></tspan>
+<tspan x="593" y="368"></tspan>
+<tspan x="593" y="392"><tspan class="key">AI.Models:</tspan>                               <tspan class="value" id="ai_models">Claude, GPT, Gemini</tspan></tspan>
+<tspan x="593" y="416"><tspan class="key">AI.Agents:</tspan>                  <tspan class="value" id="ai_agents">Claude Code, MCP, Copilot Studio</tspan></tspan>
+<tspan x="593" y="440"><tspan class="key">AI.Practice:</tspan>             <tspan class="value" id="ai_practice">Prompt Eng., RAG, Agentic Workflows</tspan></tspan>
+<tspan x="593" y="464"></tspan>
+<tspan x="593" y="488">Certifications <tspan class="cc">---------------------------------------------</tspan></tspan>
+<tspan x="593" y="512"><tspan class="key">Anthropic.Claude:</tspan>                <tspan class="value" id="cert_claude">Claude 101, Claude Code 101</tspan></tspan>
+<tspan x="593" y="536"><tspan class="key">Anthropic.Platform:</tspan>     <tspan class="value" id="cert_platform">Claude Platform 101, Intro to Cowork</tspan></tspan>
+<tspan x="593" y="560"></tspan>
+<tspan x="593" y="584">Contact <tspan class="cc">----------------------------------------------------</tspan></tspan>
+<tspan x="593" y="608"><tspan class="key">Website:</tspan>                                 <tspan class="value" id="website">abdellahboudlal.com</tspan></tspan>
+<tspan x="593" y="632"><tspan class="key">LinkedIn:</tspan>                                           <tspan class="value" id="linkedin">aboudlal</tspan></tspan>
+<tspan x="593" y="656"></tspan>
+<tspan x="593" y="680">GitHub Stats <tspan class="cc">-----------------------------------------------</tspan></tspan>
+<tspan x="593" y="704"><tspan class="key">Repos:</tspan>    <tspan class="value" id="repo_data">31</tspan> {Contributed: <tspan class="value" id="contrib_data">21</tspan>}<tspan class="cc"> | </tspan><tspan class="key">Stars:</tspan>                    <tspan class="value" id="star_data">0</tspan></tspan>
+<tspan x="593" y="728"><tspan class="key">Commits:</tspan>                   <tspan class="value" id="commit_data">286</tspan><tspan class="cc"> | </tspan><tspan class="key">Followers:</tspan>                <tspan class="value" id="follower_data">1</tspan></tspan>
+<tspan x="593" y="752"><tspan class="key">Lines of Code on GitHub:</tspan>  <tspan class="value" id="loc_data">921,299</tspan> ( <tspan class="add" id="loc_add">1,771,105++</tspan>, <tspan class="rem" id="loc_del">849,806--</tspan> )</tspan>
 </text>
 </svg>
