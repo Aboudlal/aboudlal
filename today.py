@@ -51,7 +51,7 @@ INFO = [  # (key, id, value) | "title" | None (blank line) | special rows
 ]
 
 WIDTH, HALF = 60, 30            # info column width / left half of the stats rows (characters)
-FONT_SIZE, LINE_H = 16, 20
+FONT_SIZE, LINE_H = 16, 24
 CHAR_W = 0.602 * FONT_SIZE      # monospace advance used to size the card
 PAD, GAP = 20, 25
 FONT = "Consolas,'DejaVu Sans Mono','Courier New',monospace"

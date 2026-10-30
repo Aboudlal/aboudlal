@@ -6,7 +6,6 @@ photo_cropped.png -> ASCII portrait, written in two places:
 Regenerate the portrait on its own:   python ascii_portrait.py
 (the info columns already in the SVGs / README are kept; photo_cropped.png comes from crop_photo.py)
 """
-import os
 import re
 
 import cv2
@@ -19,7 +18,7 @@ CHARSET = "@%#*+=-:. "      # densest -> lightest
 CLAHE_CLIP, CLAHE_GRID = 1.8, 4
 
 # SVG card
-SVG_COLS, SVG_ASPECT = 48, 0.5      # width in characters, character width / line height
+SVG_COLS, SVG_ASPECT = 70, 0.5      # width in characters, character width / line height
 X = 20                              # left margin (px)
 FONT = "Consolas,'DejaVu Sans Mono','Courier New',monospace"
 SVGS = {                            # file: (colour, invert)
@@ -82,8 +81,6 @@ def block_svg(rows, top, bottom, colour):
 
 def write_svgs(gray, alpha):
     for filename, (colour, invert) in SVGS.items():
-        if not os.path.exists(filename):   # SVG cards are optional
-            continue
         with open(filename, encoding="utf-8") as f:
             svg = f.read()
         m = re.search(r'data-top="([\d.]+)" data-bottom="([\d.]+)"', svg)
